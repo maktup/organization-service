@@ -1,0 +1,76 @@
+
+#[DEPLOYMENT-SERVICE]
+#2_department-service_[Deployment-Service].yml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: department-service
+  namespace: default
+  labels:
+    app: microservicio-department-service
+    role: backend
+    stage: production
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: microservicio-department-service
+      version: v1.0.0  
+  template:
+    metadata:
+      labels:
+        app: microservicio-department-service
+        version: v1.0.0
+    spec:
+      containers:                  
+        - name: microservicio-department-service
+          image: maktup/department-service:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          #--------------------------#  
+          volumeMounts:
+          - mountPath: /app/log
+            name: volumen-logs 
+      volumes:
+        - name: volumen-logs 
+          persistentVolumeClaim:
+            claimName: microservicio-department-pvc
+          #--------------------------#   
+          env:
+          #CONFIGURACION DE 'SECRETs': 
+          - name: BOOTADMIN_USUARIO
+            valueFrom:
+              secretKeyRef:
+                key: BOOTADMIN_USUARIO
+                name: department-service-secret
+          - name: BOOTADMIN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: BOOTADMIN_PASSWORD
+                name: department-service-secret
+
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: department-service
+  namespace: default
+  labels:
+    app: microservicio-department-service
+    role: backend
+    stage: production
+spec: 
+  ports:
+    - name: http
+      port: 8080
+  selector:
+    app: microservicio-department-service
+    version: v1.0.0
+  type: NodePort
+  
+
+  

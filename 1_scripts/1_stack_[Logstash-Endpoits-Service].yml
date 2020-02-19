@@ -1,0 +1,40 @@
+
+#[ENDPOINTS-SERVICE]
+#1_stack_[Logstash-Endpoits-Service].yml
+
+apiVersion: v1
+kind: Endpoints
+metadata:
+  name: logstash-external-ip
+  namespace: default
+  labels:
+    app: microservicio-logstash-server
+    role: backend
+    stage: production
+subsets: 
+  - addresses:
+      #IMPORTANTE: Debe ser una IP-FIJA. 
+      - ip: 192.168.137.1
+    ports:
+      - name: http
+        #PUERTO de escucha para 'BEATS' del 'LOGSTASH'
+        port: 5044
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  #IMPORTANTE: Debe llamarse igual que el 'Endpoint' creado.
+  name: logstash-external-ip
+  namespace: default
+  labels:
+    app: microservicio-logstash-server
+    role: backend
+    stage: production
+spec:
+  ports:
+    - name: http
+      port: 5044
+      targetPort: 5044
+  type: NodePort

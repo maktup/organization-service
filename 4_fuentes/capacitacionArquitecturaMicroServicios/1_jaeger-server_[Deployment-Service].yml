@@ -1,0 +1,68 @@
+
+#[DEPLOYMENT-SERVICE]
+#1_jaeger-server_[Deployment-Service].yml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jaeger-server
+  namespace: default
+  labels:
+    app: microservicio-jaeger-server
+    role: backend
+    stage: production
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: microservicio-jaeger-server
+      version: v1.0.0
+  template:
+    metadata:
+      labels:
+        app: microservicio-jaeger-server
+        version: v1.0.0
+    spec:
+      containers:
+      - name: jaeger-server
+        image: jaegertracing/all-in-one:latest
+        imagePullPolicy: Always
+        resources:
+          limits:
+            cpu: 500m
+            memory: 500Mi
+          requests:
+            cpu: 500m
+            memory: 500Mi
+        env:
+        - name: COLLECTOR_ZIPKIN_HTTP_PORT
+          value: "9411"
+
+---
+ 
+apiVersion: v1
+kind: Service
+metadata:
+  name: jaeger-server
+  namespace: default
+  labels:
+    app: microservicio-jaeger-server
+    role: backend
+    stage: production
+spec:
+  selector:
+    app: microservicio-jaeger-server
+    version: v1.0.0
+  ports:
+    - name: jaeger-agent-thrift
+      protocol: UDP
+      port: 6831
+    - name: jaeger-query
+      protocol: TCP
+      port: 16686
+    - name: jaeger-collector
+      protocol: TCP
+      port: 14268
+  type: NodePort
+ 
+       

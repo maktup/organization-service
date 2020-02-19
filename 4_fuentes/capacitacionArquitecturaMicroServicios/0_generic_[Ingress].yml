@@ -1,0 +1,189 @@
+
+#[INGRESS]
+#0_generic_[Ingress].yml
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: gateway-ingress
+  namespace: default
+spec:
+  rules:
+#--------------------------------------------------------#
+#----------- CONFIGURACION [employee-service] -----------#
+#--------------------------------------------------------#
+  - host: capacitacion.microservicios.employee
+    http:
+      paths:
+      - path: "/employeeservice/get"
+        backend:
+          serviceName: employee-service
+          servicePort: 8080
+
+      - path: "/employeeservice/post"
+        backend:
+          serviceName: employee-service
+          servicePort: 8080
+
+      - path: "/actuator"
+        backend:
+          serviceName: employee-service
+          servicePort: 8080
+
+      - path: "/actuator/prometheus"
+        backend:
+          serviceName: employee-service
+          servicePort: 8080
+
+      - path: "/actuator/health"
+        backend:
+          serviceName: employee-service
+          servicePort: 8080
+#--------------------------------------------------------#
+#---------- CONFIGURACION [department-service] ----------#
+#--------------------------------------------------------#
+  - host: capacitacion.microservicios.department
+    http:
+      paths:
+      - path: "/departmentservice/get"
+        backend:
+          serviceName: department-service
+          servicePort: 8080
+
+      - path: "/departmentservice/post"
+        backend:
+          serviceName: department-service
+          servicePort: 8080        
+
+      - path: "/actuator"
+        backend:
+          serviceName: department-service
+          servicePort: 8080
+
+      - path: "/actuator/prometheus"
+        backend:
+          serviceName: department-service
+          servicePort: 8080
+
+      - path: "/actuator/health"
+        backend:
+          serviceName: department-service
+          servicePort: 8080
+#--------------------------------------------------------#
+#--------- CONFIGURACION [organization-service] ---------#
+#--------------------------------------------------------# 
+  - host: capacitacion.microservicios.organization
+    http:
+      paths:
+      - path: "/organizationservice/get"
+        backend:
+          serviceName: organization-service
+          servicePort: 8080
+
+      - path: "/organizationservice/post"
+        backend:
+          serviceName: organization-service
+          servicePort: 8080
+
+      - path: "/actuator"
+        backend:
+          serviceName: organization-service
+          servicePort: 8080
+
+      - path: "/actuator/prometheus"
+        backend:
+          serviceName: organization-service
+          servicePort: 8080
+
+      - path: "/actuator/health"
+        backend:
+          serviceName: organization-service
+          servicePort: 8080
+#--------------------------------------------------------#
+#-------------- CONFIGURACION [utl-capadb] --------------#
+#--------------------------------------------------------# 
+  - host: capacitacion.microservicios.utlcapadb
+    http:
+      paths:
+      - path: "/utlcapadb/get"
+        backend:
+          serviceName: utl-capadb-service
+          servicePort: 8080
+
+      - path: "/utlcapadb/post"
+        backend:
+          serviceName: utl-capadb-service
+          servicePort: 8080
+
+      - path: "/actuator"
+        backend:
+          serviceName: utl-capadb-service
+          servicePort: 8080
+
+      - path: "/actuator/prometheus"
+        backend:
+          serviceName: utl-capadb-service
+          servicePort: 8080
+
+      - path: "/actuator/health"
+        backend:
+          serviceName: utl-capadb-service
+          servicePort: 8080
+#--------------------------------------------------------#
+#---------- CONFIGURACION [boot-admin-server] -----------#
+#--------------------------------------------------------# 
+  - host: capacitacion.microservicios.boot-admin-server
+    http:
+      paths:
+      - path: "/"
+        backend:
+          serviceName: boot-admin-server
+          servicePort: 8080
+#--------------------------------------------------------#
+#------------ CONFIGURACION [zipkin-server] -------------#
+#--------------------------------------------------------# 
+  - host: capacitacion.microservicios.zipkin-server
+    http:
+      paths:
+      - path: "/"
+        backend:
+          serviceName: zipkin-server
+          servicePort: 9411
+#--------------------------------------------------------#
+#------------ CONFIGURACION [grafana-server] ------------#
+#--------------------------------------------------------# 
+  - host: capacitacion.microservicios.grafana-server
+    http:
+      paths:
+      - path: "/"
+        backend:
+          serviceName: grafana-server
+          servicePort: 3000
+#--------------------------------------------------------#
+#---------- CONFIGURACION [prometheus-server] -----------#
+#--------------------------------------------------------# 
+  - host: capacitacion.microservicios.prometheus-server
+    http:
+      paths:
+      - path: "/"
+        backend:
+          serviceName: prometheus-server
+          servicePort: 9090
+#--------------------------------------------------------#
+#------------ CONFIGURACION [jaeger-server] -------------#
+#--------------------------------------------------------# 
+  - host: capacitacion.microservicios.jaeger-server
+    http:
+      paths:
+      - path: "/"
+        backend:
+          serviceName: jaeger-server
+          servicePort: 16686
+  - host: capacitacion.microservicios.jaeger-server-view
+    http:
+      paths:
+      - path: "/api/traces"
+        backend:
+          serviceName: jaeger-server
+          servicePort: 14268
+

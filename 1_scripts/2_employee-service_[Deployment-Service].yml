@@ -1,0 +1,73 @@
+
+#[DEPLOYMENT-SECRET]
+#2_employee-service_[Deployment-Service].yml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: employee-service
+  namespace: default
+  labels:
+    app: microservicio-employee-service
+    role: backend
+    stage: production
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: microservicio-employee-service
+      version: v1.0.0  
+  template:
+    metadata:
+      labels:
+        app: microservicio-employee-service
+        version: v1.0.0
+    spec:
+      containers:                  
+        - name: microservicio-employee-service
+          image: maktup/employee-service:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          #--------------------------#  
+          volumeMounts:
+          - mountPath: /app/log
+            name: volumen-logs 
+      volumes:
+        - name: volumen-logs 
+          persistentVolumeClaim:
+            claimName: microservicio-employee-pvc
+          #--------------------------#   
+          env:
+          #CONFIGURACION DE 'SECRETs': 
+          - name: BOOTADMIN_USUARIO
+            valueFrom:
+              secretKeyRef:
+                key: BOOTADMIN_USUARIO
+                name: employee-service-secret
+          - name: BOOTADMIN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: BOOTADMIN_PASSWORD
+                name: employee-service-secret
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: employee-service
+  namespace: default
+  labels:
+    app: microservicio-employee-service
+    role: backend
+    stage: production
+spec: 
+  ports:
+    - name: http
+      port: 8080
+  selector:
+    app: microservicio-employee-service
+    version: v1.0.0
+  type: NodePort
+

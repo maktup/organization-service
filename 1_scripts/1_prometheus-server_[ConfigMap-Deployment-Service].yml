@@ -1,0 +1,104 @@
+
+#[CONFIGMAP-DEPLOYMENT-SERVICE]
+#1_prometheus-server_[ConfigMap-Deployment-Service].yml
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-server
+  namespace: default
+data:
+  ###########################################################################################################################################################################
+  ###### CONFIGURACION DE 'PHOMETHEUS' AL LEVANTAR EL SERVIDOR, PARA QUE RECONOZCA & SE CONECTA AL: '/actuator/prometheus' DE C/U DE LOS 'MICROSERVICIOS' RESPECTIVOS. ######
+  ###########################################################################################################################################################################    
+  #'NOMBRE' DEL ARCHIVO: 'YAMEL'
+  prometheus.yml: |
+    global:
+      scrape_interval: 15s
+      evaluation_interval: 15s
+    alerting:
+      alertmanagers:
+      - static_configs:
+        - targets:
+          #INGRESAR ALERTAS: - alertmanager:9093
+    rule_files:
+      #INGRESAR REGLA - "first_rules.yml"
+      #INGRESAR REGLA - "second_rules.yml"
+    scrape_configs:
+      - job_name: 'Prometheus-Server -> [employee-service]' 
+        metrics_path: /actuator/prometheus
+        scheme: http
+        static_configs:
+        - targets: ['capacitacion.microservicios.employee']
+      
+      - job_name: 'Prometheus-Server -> [department-service]' 
+        metrics_path: /actuator/prometheus
+        scheme: http
+        static_configs:
+        - targets: ['capacitacion.microservicios.department']
+      
+      - job_name: 'Prometheus-Server -> [organization-service]' 
+        metrics_path: /actuator/prometheus
+        scheme: http
+        static_configs:
+        - targets: ['capacitacion.microservicios.organization']
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus-server
+  namespace: default
+  labels:
+    app: microservicio-prometheus-server
+    role: backend
+    stage: production
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: microservicio-prometheus-server
+      version: v1.0.0
+  template:
+    metadata:
+      labels:
+        app: microservicio-prometheus-server
+        version: v1.0.0
+    spec:
+      containers:
+      - name: microservicio-prometheus-server
+        image: prom/prometheus:latest
+        volumeMounts:
+          - name: config-volume
+            #USAR SIEMPRE COMO NOMBRE: 'prometheus.yml' 
+            mountPath: /etc/prometheus/prometheus.yml
+            subPath: prometheus.yml
+        ports:
+        - containerPort: 9090
+      volumes:
+        - name: config-volume
+          configMap:
+           #EL NOMBRE DEL: 'CONFIGMAP' 
+           name: prometheus-server
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus-server
+  namespace: default
+  labels:
+    app: microservicio-prometheus-server
+    role: backend
+    stage: production
+spec: 
+  ports:
+    - name: http
+      port: 9090
+  selector:
+    app: microservicio-prometheus-server
+    version: v1.0.0
+  type: NodePort
+

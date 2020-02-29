@@ -11,6 +11,7 @@ metadata:
     app: microservicio-utl-capadb-service
     role: backend
     stage: production
+    version: v1.0.0
 spec:
   replicas: 1
   selector:
@@ -29,6 +30,38 @@ spec:
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
+          #IMPORTANTE: Si NO se configura [CPU/RAM] NO funcionara el: 'AUTOSCALING'.     
+          resources:
+            limits:
+              cpu: 500m
+          env:
+          #CONFIGURACION DE 'SECRETs':
+          - name: DUMMY_VARIABLE
+            value: javaman
+            
+          - name: BOOTADMIN_USUARIO
+            valueFrom:
+              secretKeyRef:
+                key: BOOTADMIN_PASSWORD
+                name: utl-capadb-secret
+            
+          - name: BOOTADMIN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: BOOTADMIN_PASSWORD
+                name: utl-capadb-secret
+                
+          - name: ORACLE_USUARIO
+            valueFrom:
+              secretKeyRef:
+                key: ORACLE_USUARIO
+                name: utl-capadb-secret
+            
+          - name: ORACLE_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: ORACLE_PASSWORD
+                name: utl-capadb-secret 
           #--------------------------#  
           volumeMounts:
           - mountPath: /app/log
@@ -37,20 +70,8 @@ spec:
         - name: volumen-logs 
           persistentVolumeClaim:
             claimName: microservicio-utl-capadb-pvc
-          #--------------------------#  
-          env:
-          #CONFIGURACION DE 'SECRETs': 
-          - name: BOOTADMIN_USUARIO
-            valueFrom:
-              secretKeyRef:
-                key: BOOTADMIN_USUARIO
-                name: utl-capadb-service-secret
-          - name: BOOTADMIN_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                key: BOOTADMIN_PASSWORD
-                name: utl-capadb-service-secret
-
+          #--------------------------#      
+                              
 ---
 
 apiVersion: v1
@@ -71,3 +92,4 @@ spec:
     version: v1.0.0
   type: NodePort
 
+ 

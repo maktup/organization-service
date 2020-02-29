@@ -11,6 +11,7 @@ metadata:
     app: microservicio-organization-service
     role: backend
     stage: production
+    version: v1.0.0
 spec:
   replicas: 1
   selector:
@@ -29,6 +30,26 @@ spec:
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
+          #IMPORTANTE: Si NO se configura [CPU/RAM] NO funcionara el: 'AUTOSCALING'.     
+          #resources:
+          #  limits:
+          #    cpu: 400m
+          env:
+          #CONFIGURACION DE 'SECRETs': 
+          - name: DUMMY_VARIABLE
+            value: javaman
+            
+          - name: BOOTADMIN_USUARIO
+            valueFrom:
+              secretKeyRef:
+                key: BOOTADMIN_PASSWORD
+                name: organization-service-secret
+            
+          - name: BOOTADMIN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: BOOTADMIN_PASSWORD
+                name: organization-service-secret
           #--------------------------#  
           volumeMounts:
           - mountPath: /app/log
@@ -38,18 +59,6 @@ spec:
           persistentVolumeClaim:
             claimName: microservicio-organization-pvc
           #--------------------------#  
-          env:
-          #CONFIGURACION DE 'SECRETs': 
-          - name: BOOTADMIN_USUARIO
-            valueFrom:
-              secretKeyRef:
-                key: BOOTADMIN_USUARIO
-                name: organization-service-secret
-          - name: BOOTADMIN_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                key: BOOTADMIN_PASSWORD
-                name: organization-service-secret
 
 ---
 

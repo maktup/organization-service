@@ -1,0 +1,180 @@
+swagger: '2.0'
+info:
+  description: 'CONTRATO/API DEL MICROSERVICIO: organization-service'
+  version: '1.0'
+  title: 'CONTRATO/API PARA LA GESTION DE ORGANIZACION'
+  termsOfService: 'http://swagger.io/terms/'
+  contact:
+    email: cesarricardo_guerra19@hotmail.com
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+    
+host: pe.com.capacitacion
+basePath: /organizationservice
+schemes:
+  - http
+  
+paths: 
+
+  #####################################################################################################
+  ########################################## [ORGANIZACION] ###########################################
+  ##################################################################################################### 
+  /post/organizacion:
+    post:
+      summary: Funcionalidad para [REGISTRAR] una ENTIDAD de tipo Organizacion.
+      description: Funcionalidad para [REGISTRAR] una ENTIDAD de tipo Organizacion.
+      operationId: agregarOrganizacion
+      produces: 
+        - application/json
+      parameters:
+        - name: body
+          in: body 
+          description: La Entidad del Organizacion
+          required: true
+          schema:
+            $ref: '#/definitions/Organizacion'
+      responses:
+        '200':
+          description: PROCESO EXITOSO
+          schema:
+            $ref: '#/definitions/ResponseOrglMsg'
+        '400':
+          description: ERROR EN EL PROCESO 
+          schema:
+            $ref: '#/definitions/ResponseOrglMsg'
+  
+  
+  /delete/organizacion/{id}:
+    delete:
+      summary: Funcionalidad para [ELIMINAR] una ENTIDAD de tipo Organizacion.
+      description: Funcionalidad para [ELIMINAR] una ENTIDAD de tipo Organizacion.
+      operationId: eliminarOrganizacion
+      parameters:
+        - name: id
+          in: path
+          description: El id de la Organizacion
+          required: true
+          type: integer 
+      responses:
+        '200':
+          description: PROCESO EXITOSO
+          schema:
+            $ref: '#/definitions/ResponseOrglMsg'
+        '400':
+          description: ERROR EN EL PROCESO 
+          schema:
+            $ref: '#/definitions/ResponseOrglMsg'
+ 
+ 
+  /get/organizacion:
+    get:
+      summary: Funcionalidad para [CONSULTAR] una ENTIDAD de tipo Organizacion completa.
+      description: Funcionalidad para [CONSULTAR] una ENTIDAD de tipo Organizacion completa.
+      operationId: consultarOrganizaionAll
+      responses:
+        '200':
+          description: PROCESO EXITOSO
+          schema:
+            $ref: '#/definitions/ResponseOrglMsg'
+        '400':
+          description: ERROR EN EL PROCESO 
+          schema:
+            $ref: '#/definitions/ResponseOrglMsg'  
+            
+
+  /get/organizacion/{id}:
+    get:
+      summary: Funcionalidad para [CONSULTAR] una ENTIDAD de tipo Organizacion completa por id.
+      description: Funcionalidad para [CONSULTAR] una ENTIDAD de tipo Organizacion completa por id.
+      operationId: consultarOrganizacionPorId
+      parameters:
+        - name: id
+          in: path
+          description: El id del Organizacion
+          required: true
+          type: integer 
+      responses:
+        '200':
+          description: PROCESO EXITOSO
+          schema:
+            $ref: '#/definitions/ResponseOrglMsg'
+        '400':
+          description: ERROR EN EL PROCESO 
+          schema:
+            $ref: '#/definitions/ResponseOrglMsg' 
+            
+ 
+ #####################################################################################################
+ ########################################### [ENTIDADES] #############################################
+ ##################################################################################################### 
+definitions: 
+  Empleado:
+    type: object
+    properties:
+      id:
+        type: integer
+      nombre:
+        type: string
+      edad:
+        type: integer
+      rol:
+        type: string
+      idDep:
+        type: integer  
+        
+  Departamento:
+    type: object
+    properties:
+      id:
+        type: integer
+      nombre:
+        type: string
+      idOrg:
+        type: integer
+      listaEmpleados:
+        type: array
+        items:
+          $ref: '#/definitions/Empleado' 
+          
+  Organizacion:
+    type: object
+    properties:
+      id:
+        type: integer
+      nombre:
+        type: string
+      direccion:
+        type: integer
+      listaDepartamentos:
+        type: array
+        items:
+          $ref: '#/definitions/Departamento'  
+          
+  ResponseOrglMsg:
+    type: object
+    properties:
+      auditoria:
+        type: object
+        properties:
+          ipApp:
+            type: string
+          nombreApp:
+            type: string
+          usuarioApp:
+            type: string
+          codigoApp:
+            type: string
+          codigoHttp:
+            type: string 
+          mensajeApp:
+            type: string 
+      listaOrganizaciones:
+        type: array
+        items:
+          $ref: '#/definitions/Organizacion'  
+ 
+externalDocs:
+  description: Encuentra mas sobre SWAGGER
+  url: 'http://swagger.io'
+

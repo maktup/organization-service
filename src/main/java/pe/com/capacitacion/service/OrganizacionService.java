@@ -141,7 +141,7 @@ import pe.com.capacitacion.util.Constantes;
 		@HystrixCommand( fallbackMethod = "lanzarListaExceptionWS" )   //ANTE UNA FALLA LANZARPA EL MÉTODO: [lanzarListaExceptionWS].
 		public ResponseEntity<ResponseOrgMsg> consultarOrganizacionesAllService(){
 			   log.info( "------> Organizacion 'consultarOrganizacionesAllService'" );
-  
+			   
 			   Gson         objGson   = new Gson();
 			   String       vURI_01   = "/organizaciones";
 			   String       vURI_02   = "/departamentos-organizacion/";
@@ -155,18 +155,17 @@ import pe.com.capacitacion.util.Constantes;
 			   
 			   String vHostKubernetes = objServiceInstance.getUri() + ""; 
 			   log.info( "-----> vHostKubernetes: [" + objServiceInstance.getUri() + "]" );
-
 			   
-			   //----------------------------------------------------------- [UTL-CAPADB] -----------------------------------------------------------//  
+			   //----------------------------------------------------------- [UTL-CAPADB] -----------------------------------------------------------// 
 			   //Armando URI:
 			   String vURL01 = (vHostKubernetes + "/" + Constantes.SERVICE_NAME_04 + "/" + Constantes.HTTP_METHOD_01 + vURI_01); 
 			   log.info( "========>: vURL01 [" + vURL01 + "]" );
-			   
-			   //Enviar mensaje GET: 
+		 
+			   //Enviar mensaje GET:
 			   String vCadenaJSON_01 = objRspTmp.getForObject( vURL01, String.class );
 			   log.info( "========>: vCadenaJSON_01 [" + vCadenaJSON_01 + "]" ); 
 			   
-			   //Transformar de JSON a OBJETO:  
+			   //Transformar de JSON a OBJETO: 
 			   pe.com.capacitacion.dto.ResponseOrgMsg objResponseOrgMsg = objGson.fromJson( vCadenaJSON_01, pe.com.capacitacion.dto.ResponseOrgMsg.class );
 			   log.info( "========>: objResponseOrgMsg: " + objResponseOrgMsg ); 
 			   //----------------------------------------------------------- [UTL-CAPADB] -----------------------------------------------------------//
@@ -191,15 +190,15 @@ import pe.com.capacitacion.util.Constantes;
 					     vHostKubernetes = objServiceInstance.getUri() + ""; 
 					     log.info( "-----> vHostKubernetes: [" + objServiceInstance.getUri() + "]" );
 					     
-					     //Armando URI: 
-					     String vURL02 = (objServiceInstance + "/" + Constantes.SERVICE_NAME_01 + "/" + Constantes.HTTP_METHOD_01 + vURI_02 + idOrg); 
+					     //Armando URI:
+					     String vURL02 = (vHostKubernetes + "/" + Constantes.SERVICE_NAME_01 + "/" + Constantes.HTTP_METHOD_01 + vURI_02 + idOrg); 
 					     log.info( "========>: vURL02 [" + vURL02 + "]" );
 					   
-					     //Enviar mensaje GET: 
-					     String vCadenaJSON_02 = objRspTmp.getForObject( vURL02, String.class );  
+					     //Enviar mensaje GET:
+					     String vCadenaJSON_02 = objRspTmp.getForObject( vURL02, String.class );
 					     log.info( "========>: vCadenaJSON_02 [" + vCadenaJSON_02 + "]" ); 
 					   
-					     //Transformar de JSON a OBJETO:  
+					     //Transformar de JSON a OBJETO: 
 					     pe.com.capacitacion.dto.ResponseDepMsg objResponseDepMsg = objGson.fromJson( vCadenaJSON_02, pe.com.capacitacion.dto.ResponseDepMsg.class );
 					     log.info( "========>: objResponseDepMsg: " + objResponseDepMsg );  
 					     //-----------------------------------------------------------------------------------------------------------------------------------//
@@ -211,19 +210,18 @@ import pe.com.capacitacion.util.Constantes;
 						     listaDepartamento = objResponseDepMsg.getListaDepartamentos(); 
 					     }
 					     catch( Exception e){ 
-					     }  
+					     } 				    
 					   
 					     if( (listaDepartamento != null) && (listaDepartamento.size() > 0) ){ 
 						     log.info( "========>: TAMANIO 'listaDepartamento' [" + listaDepartamento.size() + "]" ); 
 						     objOrganizacion.getListaDepartamentos().addAll( listaDepartamento );
 					     }
 				   } 
-				   
 			   }			   
 			   
 			   //Objeto Return:
 			   ResponseEntity<ResponseOrgMsg> objRetorno = new ResponseEntity<ResponseOrgMsg>( objResponseOrgMsg, HttpStatus.OK ); 
-			   return objRetorno;	
+			   return objRetorno;	 
 		}	
 		
 	   /**

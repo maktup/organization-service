@@ -47,6 +47,9 @@ import pe.com.capacitacion.util.Constantes;
         @Autowired
     	private Environment objVariablesEntorno;
         
+        @Autowired
+        private io.opentracing.Tracer jaegerAlertTracer; 
+        
         
 	   /**
 	    * agregarOrganizacionService 	
@@ -56,6 +59,8 @@ import pe.com.capacitacion.util.Constantes;
 		@HystrixCommand( fallbackMethod = "lanzarExceptionWS" )   //ANTE UNA FALLA LANZARPA EL MÉTODO: [lanzarExceptionWS].
 		public ResponseEntity<ResponseOrgMsg> agregarOrganizacionService( Organizacion organizacion ){ 
 			   log.info( "------> Organizacion 'agregarOrganizacionService': {}", organizacion );
+			   
+			   io.opentracing.Scope objJaegerNombreOperacion = this.jaegerAlertTracer.buildSpan( "[agregarOrganizacionService]" ).startActive( true ); 
 			   
 			   Gson         objGson   = new Gson();
 			   String       vURI      = "/organizaciones";
@@ -77,7 +82,10 @@ import pe.com.capacitacion.util.Constantes;
 			   //Transformar de OBJETO a JSON:                                         
 			   String vParamRequestJSON = objGson.toJson( organizacion );
 			   log.info( "========>: vParamRequestJSON: " + vParamRequestJSON ); 
-			   	       
+			   	      
+			   //Agente JAEGER:  
+			   io.opentracing.Span objJaegerServicioHijo_01 = this.jaegerAlertTracer.buildSpan( "[utl-capadb]" ).asChildOf( objJaegerNombreOperacion.span() ).start();
+			   
 			   //Definiendo Entity: 
 			   HttpHeaders objHeader = new HttpHeaders(); 
 			   objHeader.setContentType( MediaType.APPLICATION_JSON );		 
@@ -86,6 +94,7 @@ import pe.com.capacitacion.util.Constantes;
 			   //Enviar mensaje POST: 
 			   ResponseEntity<String> vCadenaJSON_01 = objRspTmp.postForEntity( vURL, objEntityRequest, String.class );
 			   log.info( "========>: vCadenaJSON_01 [" + vCadenaJSON_01.getBody() + "]" );
+			   objJaegerServicioHijo_01.finish();
 			   
 			   //Transformar de JSON a OBJETO:   
 			   pe.com.capacitacion.dto.ResponseOrgMsg objResponseOrgMsg = objGson.fromJson( vCadenaJSON_01.getBody(), pe.com.capacitacion.dto.ResponseOrgMsg.class );
@@ -93,8 +102,10 @@ import pe.com.capacitacion.util.Constantes;
  
 			   //Objeto Return: 
 			   ResponseEntity<ResponseOrgMsg> objRetorno = new ResponseEntity<ResponseOrgMsg>( objResponseOrgMsg, HttpStatus.OK ); 
-			   return objRetorno;			   
-		}		
+			   
+			   objJaegerNombreOperacion.close(); 
+			   return objRetorno;	 
+		}			
 	
 	   /**
 	    * eliminarOrganizacionService 	
@@ -105,6 +116,8 @@ import pe.com.capacitacion.util.Constantes;
 		public ResponseEntity<ResponseOrgMsg> eliminarOrganizacionService( Long id ){
 			   log.info( "------> Organizacion 'eliminarOrganizacionService': {}", id );
 	 
+			   io.opentracing.Scope objJaegerNombreOperacion = this.jaegerAlertTracer.buildSpan( "[eliminarOrganizacionService]" ).startActive( true ); 
+			   
 			   String       vURI      = "/organizaciones/";
 			   RestTemplate objRspTmp = this.objTemplate.build(); 
 			   
@@ -121,9 +134,13 @@ import pe.com.capacitacion.util.Constantes;
 			   String vURL = (vHostKubernetes + "/" + Constantes.SERVICE_NAME_04 + "/" + Constantes.HTTP_METHOD_03 + vURI + id); 
 			   log.info( "========>: vURL [" + vURL + "]" );
 			   
+			   //Agente JAEGER:  
+			   io.opentracing.Span objJaegerServicioHijo_01 = this.jaegerAlertTracer.buildSpan( "[utl-capadb]" ).asChildOf( objJaegerNombreOperacion.span() ).start();
+			   
 			   //Enviar mensaje DELETE: 
 			   objRspTmp.delete( vURL );  //Es VOID. 
-               
+			   objJaegerServicioHijo_01.finish();
+			   
 			   //Armando estructura RESPONSE: 
 			   Auditoria      objAuditoria      = super.cargarDatosAuditoria( Constantes.IP_APP_NOK, Constantes.MSJ_APP_OK, Constantes.USUARIO_APP_NOK, Constantes.MSJ_APP_OK ); 
 			   ResponseOrgMsg objResponseOrgMsg = new ResponseOrgMsg();
@@ -131,8 +148,10 @@ import pe.com.capacitacion.util.Constantes;
  
 			   //Objeto Return: 
 			   ResponseEntity<ResponseOrgMsg> objRetorno = new ResponseEntity<ResponseOrgMsg>( objResponseOrgMsg, HttpStatus.OK ); 
-			   return objRetorno;				   
-		}
+			  
+			   objJaegerNombreOperacion.close(); 
+			   return objRetorno;	 
+		}	
 		
 	   /**
 	    * consultarOrganizacionesAllService	
@@ -141,7 +160,9 @@ import pe.com.capacitacion.util.Constantes;
 		@HystrixCommand( fallbackMethod = "lanzarListaExceptionWS" )   //ANTE UNA FALLA LANZARPA EL MÉTODO: [lanzarListaExceptionWS].
 		public ResponseEntity<ResponseOrgMsg> consultarOrganizacionesAllService(){
 			   log.info( "------> Organizacion 'consultarOrganizacionesAllService'" );
-			   
+
+               io.opentracing.Scope objJaegerNombreOperacion = this.jaegerAlertTracer.buildSpan( "[consultarOrganizacionesAllService]" ).startActive( true ); 
+ 
 			   Gson         objGson   = new Gson();
 			   String       vURI_01   = "/organizaciones";
 			   String       vURI_02   = "/departamentos-organizacion/";
@@ -161,9 +182,13 @@ import pe.com.capacitacion.util.Constantes;
 			   String vURL01 = (vHostKubernetes + "/" + Constantes.SERVICE_NAME_04 + "/" + Constantes.HTTP_METHOD_01 + vURI_01); 
 			   log.info( "========>: vURL01 [" + vURL01 + "]" );
 		 
+			   //Agente JAEGER:  
+			   io.opentracing.Span objJaegerServicioHijo_01 = this.jaegerAlertTracer.buildSpan( "[utl-capadb]" ).asChildOf( objJaegerNombreOperacion.span() ).start();
+			   
 			   //Enviar mensaje GET:
 			   String vCadenaJSON_01 = objRspTmp.getForObject( vURL01, String.class );
 			   log.info( "========>: vCadenaJSON_01 [" + vCadenaJSON_01 + "]" ); 
+			   objJaegerServicioHijo_01.finish();
 			   
 			   //Transformar de JSON a OBJETO: 
 			   pe.com.capacitacion.dto.ResponseOrgMsg objResponseOrgMsg = objGson.fromJson( vCadenaJSON_01, pe.com.capacitacion.dto.ResponseOrgMsg.class );
@@ -194,10 +219,14 @@ import pe.com.capacitacion.util.Constantes;
 					     String vURL02 = (vHostKubernetes + "/" + Constantes.SERVICE_NAME_01 + "/" + Constantes.HTTP_METHOD_01 + vURI_02 + idOrg); 
 					     log.info( "========>: vURL02 [" + vURL02 + "]" );
 					   
+						 //Agente JAEGER:  
+						 io.opentracing.Span objJaegerServicioHijo_02 = this.jaegerAlertTracer.buildSpan( "[department-service]" ).asChildOf( objJaegerNombreOperacion.span() ).start();
+					     
 					     //Enviar mensaje GET:
 					     String vCadenaJSON_02 = objRspTmp.getForObject( vURL02, String.class );
 					     log.info( "========>: vCadenaJSON_02 [" + vCadenaJSON_02 + "]" ); 
-					   
+					     objJaegerServicioHijo_02.finish();
+					     
 					     //Transformar de JSON a OBJETO: 
 					     pe.com.capacitacion.dto.ResponseDepMsg objResponseDepMsg = objGson.fromJson( vCadenaJSON_02, pe.com.capacitacion.dto.ResponseDepMsg.class );
 					     log.info( "========>: objResponseDepMsg: " + objResponseDepMsg );  
@@ -221,6 +250,8 @@ import pe.com.capacitacion.util.Constantes;
 			   
 			   //Objeto Return:
 			   ResponseEntity<ResponseOrgMsg> objRetorno = new ResponseEntity<ResponseOrgMsg>( objResponseOrgMsg, HttpStatus.OK ); 
+			   
+			   objJaegerNombreOperacion.close(); 
 			   return objRetorno;	 
 		}	
 		
@@ -232,6 +263,8 @@ import pe.com.capacitacion.util.Constantes;
 		@HystrixCommand( fallbackMethod = "lanzarExceptionWS" )   //ANTE UNA FALLA LANZARPA EL MÉTODO: [lanzarExceptionWS].
 		public ResponseEntity<ResponseOrgMsg> consultarOrganizacionesPorIdService( Long id ){
 			   log.info( "------> Organizacion 'consultarOrganizacionesPorId': id={}", id ); 
+			   
+               io.opentracing.Scope objJaegerNombreOperacion = this.jaegerAlertTracer.buildSpan( "[consultarOrganizacionesPorIdService]" ).startActive( true );
 			   
 			   Gson         objGson   = new Gson();
 			   String       vURI_01   = "/organizaciones/";
@@ -252,9 +285,13 @@ import pe.com.capacitacion.util.Constantes;
 			   String vURL01 = (vHostKubernetes + "/" + Constantes.SERVICE_NAME_04 + "/" + Constantes.HTTP_METHOD_01 + vURI_01 + id); 
 			   log.info( "========>: vURL01 [" + vURL01 + "]" );
 		 
+			   //Agente JAEGER:  
+			   io.opentracing.Span objJaegerServicioHijo_01 = this.jaegerAlertTracer.buildSpan( "[utl-capadb]" ).asChildOf( objJaegerNombreOperacion.span() ).start();
+ 
 			   //Enviar mensaje GET:
 			   String vCadenaJSON_01 = objRspTmp.getForObject( vURL01, String.class );
 			   log.info( "========>: vCadenaJSON_01 [" + vCadenaJSON_01 + "]" ); 
+			   objJaegerServicioHijo_01.finish();
 			   
 			   //Transformar de JSON a OBJETO: 
 			   pe.com.capacitacion.dto.ResponseOrgMsg objResponseOrgMsg = objGson.fromJson( vCadenaJSON_01, pe.com.capacitacion.dto.ResponseOrgMsg.class );
@@ -285,10 +322,14 @@ import pe.com.capacitacion.util.Constantes;
 					     String vURL02 = (vHostKubernetes + "/" + Constantes.SERVICE_NAME_01 + "/" + Constantes.HTTP_METHOD_01 + vURI_02 + idOrg); 
 					     log.info( "========>: vURL02 [" + vURL02 + "]" );
 					   
+					     //Agente JAEGER:   
+					     io.opentracing.Span objJaegerServicioHijo_02 = this.jaegerAlertTracer.buildSpan( "[department-service]" ).asChildOf( objJaegerNombreOperacion.span() ).start();
+					     
 					     //Enviar mensaje GET:
 					     String vCadenaJSON_02 = objRspTmp.getForObject( vURL02, String.class );
 					     log.info( "========>: vCadenaJSON_02 [" + vCadenaJSON_02 + "]" ); 
-					   
+					     objJaegerServicioHijo_02.finish(); 
+					     
 					     //Transformar de JSON a OBJETO: 
 					     pe.com.capacitacion.dto.ResponseDepMsg objResponseDepMsg = objGson.fromJson( vCadenaJSON_02, pe.com.capacitacion.dto.ResponseDepMsg.class );
 					     log.info( "========>: objResponseDepMsg: " + objResponseDepMsg );  
@@ -312,8 +353,10 @@ import pe.com.capacitacion.util.Constantes;
 			   
 			   //Objeto Return:
 			   ResponseEntity<ResponseOrgMsg> objRetorno = new ResponseEntity<ResponseOrgMsg>( objResponseOrgMsg, HttpStatus.OK ); 
+			   
+			   objJaegerNombreOperacion.close(); 
 			   return objRetorno;	 
-		}
+		}	
 	  
 	   /**
 	    * mostrarVariablesEntorno

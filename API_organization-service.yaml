@@ -15,8 +15,7 @@ basePath: /organizationservice
 schemes:
   - http
   
-paths: 
-
+paths:
   #####################################################################################################
   ########################################## [ORGANIZACION] ###########################################
   ##################################################################################################### 
@@ -111,6 +110,10 @@ paths:
 definitions: 
   Empleado:
     type: object
+    required:
+      - nombre
+      - edad
+      - rol  
     properties:
       id:
         type: integer
@@ -125,6 +128,8 @@ definitions:
         
   Departamento:
     type: object
+    required:
+      - nombre
     properties:
       id:
         type: integer
@@ -139,6 +144,9 @@ definitions:
           
   Organizacion:
     type: object
+    required:
+      - nombre
+      - direccion
     properties:
       id:
         type: integer
@@ -152,10 +160,17 @@ definitions:
           $ref: '#/definitions/Departamento'  
           
   ResponseOrglMsg:
-    type: object
+    type: object 
     properties:
       auditoria:
         type: object
+        required:
+          - ipApp
+          - nombreApp
+          - usuarioApp
+          - codigoApp
+          - codigoHttp
+          - mensajeApp
         properties:
           ipApp:
             type: string
